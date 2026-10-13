@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HINDU DHARMA QUEST - Olimpiade & LCC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        hindu: {
+                            saffron: '#FF9933',
+                            gold: '#FFD700',
+                            dark: '#1E1E2F',
+                            panel: '#2A2A40',
+                            light: '#F3F4F6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #1a1a2e;
+            background-image: radial-gradient(circle at top right, #2A2A40, #1a1a2e);
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        .glass-panel {
+            background: rgba(42, 42, 64, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 153, 51, 0.2);
+            border-radius: 1rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #FF9933 0%, #E67E22 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 153, 51, 0.4);
+        }
+        .option-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+        }
+        .option-btn:hover:not(:disabled) {
+            border-color: #FF9933;
+            background: rgba(255, 153, 51, 0.1);
+        }
+        .option-correct {
+            background: rgba(34, 197, 94, 0.2) !important;
+            border-color: #22c55e !important;
+            color: #fff;
+        }
+        .option-wrong {
+            background: rgba(239, 68, 68, 0.2) !important;
+            border-color: #ef4444 !important;
+            color: #fff;
+        }
+        .om-bg {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40vw;
+            color: rgba(255, 153, 51, 0.03);
+            z-index: -1;
+            pointer-events: none;
+            font-family: serif;
+        }
+        .streak-anim {
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .hidden-screen { display: none !important; }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="om-bg">ॐ</div>
+
+    <audio id="audio-click" src="data:audio/mp3;base64,//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq" preload="auto"></audio>
+    
+    <div class="fixed top-4 right-4 z-50">
+        <button id="btn-audio" class="w-10 h-10 rounded-full bg-hindu-panel border border-hindu-saffron flex items-center justify-center text-hindu-saffron hover:bg-hindu-saffron hover:text-white transition">
+            <i class="fas fa-volume-up"></i>
+        </button>
+    </div>
+
+    <div id="app" class="container mx-auto px-4 py-8 max-w-4xl min-h-screen flex flex-col justify-center">
+        
+        <!-- SCREEN: HOME -->
+        <div id="screen-home" class="glass-panel p-8 text-center streak-anim">
+            <div class="text-6xl text-hindu-saffron mb-4"><i class="fas fa-dharmachakra"></i></div>
+            <h1 class="text-4xl md:text-5xl font-bold mb-2 tracking-tight">HINDU DHARMA QUEST</h1>
+            <p class="text-xl text-gray-300 mb-8 italic">"Asah Pengetahuan, Uji Ketepatan, Raih Gelar Juara!"</p>
+            
+            <div class="flex flex-col md:flex-row justify-center gap-4 mb-8">
+                <button onclick="showScreen('screen-identity', 'lcc')" class="btn-primary text-white font-bold py-3 px-8 rounded-full text-lg shadow-[0_0_20px_rgba(255,153,51,0.3)]">
+                    <i class="fas fa-bolt mr-2"></i> MULAI KUIS (MODE LCC)
+                </button>
+            </div>
+            
+            <div class="flex justify-center gap-4">
+                <button onclick="showScreen('screen-instructions')" class="text-gray-400 hover:text-white transition"><i class="fas fa-book-open mr-1"></i> Petunjuk</button>
+                <span class="text-gray-600">|</span>
+                <button onclick="showScreen('screen-leaderboard')" class="text-gray-400 hover:text-white transition"><i class="fas fa-trophy mr-1"></i> Leaderboard</button>
+                <span class="text-gray-600">|</span>
+                <button onclick="showScreen('screen-admin')" class="text-gray-400 hover:text-white transition"><i class="fas fa-user-shield mr-1"></i> Guru</button>
+            </div>
+        </div>
+
+        <!-- SCREEN: INSTRUCTIONS -->
+        <div id="screen-instructions" class="glass-panel p-8 hidden-screen">
+            <h2 class="text-3xl font-bold mb-6 text-hindu-saffron border-b border-gray-600 pb-2">Petunjuk & Tentang Game</h2>
+            <div class="space-y-4 text-gray-300">
+                <p><strong>HINDU DHARMA QUEST</strong> adalah platform latihan intensif untuk persiapan Olimpiade dan LCC Agama Hindu tingkat SMA/SMK.</p>
+                <ul class="list-disc pl-5 space-y-2">
+                    <li>Terdiri dari <strong>50 Soal</strong> pilihan ganda (HOTS & Analisis).</li>
+                    <li>Sistem penilaian: Benar <strong>+100</strong>, Salah <strong>0</strong>.</li>
+                    <li>Terdapat bonus poin jika menjawab benar berturut-turut (Streak).</li>
+                    <li>Waktu dibatasi per soal (<strong>30 detik</strong>) untuk simulasi Lomba Cerdas Cermat (LCC).</li>
+                    <li>Setiap soal yang dijawab akan langsung menampilkan pembahasan.</li>
+                </ul>
+                <div class="mt-6 p-4 bg-gray-800 rounded-lg text-sm">
+                    <strong>Sumber Materi:</strong> Buku Teks Pendidikan Agama Hindu dan Budi Pekerti (Kemendikdasmen RI) dan dokumen kurikulum resmi.<br>
+                    <em>Soal disusun secara orisinal berdasarkan konsep dalam sumber resmi.</em>
+                </div>
+            </div>
+            <div class="mt-8 text-center">
+                <button onclick="showScreen('screen-home')" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-6 rounded-full transition">Kembali</button>
+            </div>
+        </div>
+
+        <!-- SCREEN: IDENTITY -->
+        <div id="screen-identity" class="glass-panel p-8 max-w-md mx-auto hidden-screen streak-anim w-full">
+            <h2 class="text-2xl font-bold mb-6 text-center text-hindu-saffron">Data Peserta</h2>
+            <form id="form-identity" onsubmit="event.preventDefault(); startQuiz();">
+                <div class="mb-4">
+                    <label class="block text-gray-300 mb-2">Nama Lengkap</label>
+                    <input type="text" id="input-name" required class="w-full bg-hindu-dark border border-gray-600 rounded p-3 text-white focus:outline-none focus:border-hindu-saffron">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-300 mb-2">Kelas</label>
+                    <select id="input-class" required class="w-full bg-hindu-dark border border-gray-600 rounded p-3 text-white focus:outline-none focus:border-hindu-saffron">
+                        <option value="">Pilih Kelas</option>
+                        <option value="X">Kelas X</option>
+                        <option value="XI">Kelas XI</option>
+                        <option value="XII">Kelas XII</option>
+                    </select>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-300 mb-2">Asal Sekolah</label>
+                    <input type="text" id="input-school" required class="w-full bg-hindu-dark border border-gray-600 rounded p-3 text-white focus:outline-none focus:border-hindu-saffron">
+                </div>
+                <div class="flex justify-between items-center">
+                    <button type="button" onclick="showScreen('screen-home')" class="text-gray-400 hover:text-white">Batal</button>
+                    <button type="submit" class="btn-primary text-white font-bold py-2 px-6 rounded-full">Lanjut <i class="fas fa-arrow-right ml-1"></i></button>
+                </div>
+            </form>
+        </div>
+
+        <!-- SCREEN: QUIZ -->
+        <div id="screen-quiz" class="hidden-screen flex-col w-full h-full">
+            <!-- Header Status -->
+            <div class="glass-panel p-4 mb-4 flex justify-between items-center text-sm md:text-base">
+                <div>
+                    <span class="text-gray-400">Soal:</span> 
+                    <span id="ui-q-num" class="font-bold text-white text-lg">1</span><span class="text-gray-400">/50</span>
+                </div>
+                <div class="flex gap-4">
+                    <div id="lcc-timer-container" class="hidden text-red-400 font-bold">
+                        <i class="fas fa-hourglass-half"></i> <span id="ui-lcc-time">30</span>s
+                    </div>
+                    <div>
+                        <span class="text-gray-400"><i class="fas fa-clock"></i></span> 
+                        <span id="ui-global-time" class="font-mono text-hindu-saffron font-bold">00:00</span>
+                    </div>
+                </div>
+                <div>
+                    <span class="text-gray-400">Skor:</span> 
+                    <span id="ui-score" class="font-bold text-hindu-gold text-lg">0</span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-gray-700 rounded-full h-2.5 mb-6">
+                <div id="ui-progress" class="bg-hindu-saffron h-2.5 rounded-full" style="width: 2%"></div>
+            </div>
+
+            <!-- Question Area -->
+            <div class="glass-panel p-6 md:p-8 mb-4 relative min-h-[400px] flex flex-col">
+                <div id="streak-indicator" class="absolute -top-3 right-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full hidden streak-anim">
+                    🔥 Streak +Bonus!
+                </div>
+                
+                <div class="mb-2 flex justify-between items-center">
+                    <span id="ui-q-materi" class="bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded uppercase tracking-wider">MATERI</span>
+                    <span id="ui-q-level" class="text-xs font-bold text-hindu-saffron">HOTS</span>
+                </div>
+                
+                <div id="ui-q-stimulus" class="text-gray-300 text-sm md:text-base mb-4 italic border-l-4 border-gray-500 pl-4"></div>
+                <div id="ui-q-text" class="text-lg md:text-xl font-semibold mb-6"></div>
+                
+                <!-- Options Grid -->
+                <div id="ui-options" class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-grow">
+                    <!-- Options injected via JS -->
+                </div>
+
+                <!-- Explanation Area (Hidden until answered) -->
+                <div id="ui-explanation-box" class="hidden mt-6 p-4 bg-hindu-dark border border-gray-600 rounded-lg">
+                    <h4 class="font-bold text-hindu-saffron mb-2"><i class="fas fa-info-circle"></i> Pembahasan</h4>
+                    <p id="ui-explanation-text" class="text-gray-300 text-sm mb-2"></p>
+                    <p class="text-xs text-gray-500"><i class="fas fa-book"></i> Sumber: <span id="ui-source-text"></span></p>
+                </div>
+            </div>
+
+            <!-- Navigation Controls -->
+            <div class="flex justify-between items-center">
+                <button id="btn-prev" onclick="navQuestion(-1)" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-6 rounded-full disabled:opacity-50 transition">
+                    <i class="fas fa-arrow-left mr-1"></i> Sebelumnya
+                </button>
+                <button id="btn-next" onclick="navQuestion(1)" class="btn-primary text-white py-2 px-6 rounded-full font-bold transition hidden">
+                    Berikutnya <i class="fas fa-arrow-right ml-1"></i>
+                </button>
+                <button id="btn-finish" onclick="finishQuiz()" class="bg-green-600 hover:bg-green-500 text-white py-2 px-6 rounded-full font-bold transition hidden">
+                    Selesai & Lihat Hasil <i class="fas fa-check-circle ml-1"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN: RESULT -->
+        <div id="screen-result" class="hidden-screen flex-col items-center">
+            <div class="glass-panel p-8 w-full max-w-2xl streak-anim">
+                <h2 class="text-3xl font-bold text-center text-white mb-2">HASIL HINDU DHARMA QUEST</h2>
+                <div class="text-center mb-6 text-gray-400" id="res-identity">Nama | Kelas | Sekolah</div>
+                
+                <div class="flex justify-center mb-6">
+                    <div class="bg-hindu-dark border-2 border-hindu-saffron rounded-full w-40 h-40 flex flex-col items-center justify-center shadow-[0_0_20px_rgba(255,153,51,0.5)]">
+                        <span class="text-gray-400 text-sm">SKOR AKHIR</span>
+                        <span id="res-score" class="text-4xl font-bold text-hindu-gold">0</span>
+                        <span class="text-xs text-gray-500">dari 5.000</span>
+                    </div>
+                </div>
+
+                <div class="text-center mb-8">
+                    <div id="res-title" class="text-2xl font-bold text-green-400 uppercase tracking-widest mb-1">KATEGORI</div>
+                    <div class="text-gray-300">Akurasi: <span id="res-percent" class="font-bold">0%</span></div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 text-center text-sm">
+                    <div class="bg-gray-800 p-3 rounded"><div class="text-gray-400">Benar</div><div id="res-correct" class="text-xl font-bold text-green-500">0</div></div>
+                    <div class="bg-gray-800 p-3 rounded"><div class="text-gray-400">Salah</div><div id="res-wrong" class="text-xl font-bold text-red-500">0</div></div>
+                    <div class="bg-gray-800 p-3 rounded"><div class="text-gray-400">Waktu</div><div id="res-time" class="text-xl font-bold text-blue-400">00:00</div></div>
+                    <div class="bg-gray-800 p-3 rounded"><div class="text-gray-400">Max Streak</div><div id="res-streak" class="text-xl font-bold text-hindu-saffron">0</div></div>
+                </div>
+
+                <!-- Analysis Chart -->
+                <h3 class="text-xl font-bold mb-4 text-hindu-saffron border-b border-gray-600 pb-2">Analisis Materi</h3>
+                <div id="res-analytics" class="space-y-3 mb-8 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                    <!-- Injected via JS -->
+                </div>
+
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button onclick="showScreen('screen-review')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-6 rounded-full transition"><i class="fas fa-search mr-1"></i> Review Jawaban</button>
+                    <button onclick="restartQuiz()" class="btn-primary text-white py-2 px-6 rounded-full font-bold transition"><i class="fas fa-redo mr-1"></i> Latihan Lagi</button>
+                    <button onclick="showScreen('screen-home')" class="bg-hindu-dark border border-gray-500 hover:bg-gray-800 text-white py-2 px-6 rounded-full transition"><i class="fas fa-home mr-1"></i> Beranda</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN: REVIEW -->
+        <div id="screen-review" class="hidden-screen flex-col w-full h-full max-w-3xl mx-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-hindu-saffron">Review Jawaban</h2>
+                <button onclick="showScreen('screen-result')" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-full text-sm">Kembali ke Hasil</button>
+            </div>
+            <div id="review-container" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- SCREEN: LEADERBOARD -->
+        <div id="screen-leaderboard" class="hidden-screen glass-panel p-8 w-full max-w-2xl mx-auto">
+            <div class="flex justify-between items-center mb-6 border-b border-gray-600 pb-4">
+                <h2 class="text-3xl font-bold text-hindu-saffron"><i class="fas fa-trophy mr-2"></i> Papan Peringkat</h2>
+                <button onclick="showScreen('screen-home')" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-gray-300">
+                    <thead class="text-xs uppercase bg-gray-700 text-gray-400">
+                        <tr>
+                            <th class="px-4 py-3">Rank</th>
+                            <th class="px-4 py-3">Nama</th>
+                            <th class="px-4 py-3">Sekolah</th>
+                            <th class="px-4 py-3">Skor</th>
+                            <th class="px-4 py-3">Waktu</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                        <!-- Injected -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SCREEN: ADMIN -->
+        <div id="screen-admin" class="hidden-screen glass-panel p-8 w-full max-w-4xl mx-auto">
+            <div class="flex justify-between items-center mb-6 border-b border-gray-600 pb-4">
+                <h2 class="text-2xl font-bold text-hindu-saffron"><i class="fas fa-user-shield mr-2"></i> Dashboard Guru</h2>
+                <div>
+                    <button onclick="exportCSV()" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded text-sm mr-2"><i class="fas fa-download mr-1"></i> Export CSV</button>
+                    <button onclick="showScreen('screen-home')" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <div class="bg-gray-800 p-4 rounded text-center"><div class="text-2xl font-bold text-white" id="adm-total">0</div><div class="text-xs text-gray-400">Total Sesi</div></div>
+                <div class="bg-gray-800 p-4 rounded text-center"><div class="text-2xl font-bold text-green-400" id="adm-avg">0</div><div class="text-xs text-gray-400">Rata-rata Skor</div></div>
+                <div class="bg-gray-800 p-4 rounded text-center"><button onclick="clearAdminData()" class="text-red-500 text-xs mt-2 underline">Hapus Semua Data</button></div>
+            </div>
+            <div class="overflow-x-auto max-h-96">
+                <table class="w-full text-left text-sm text-gray-300">
+                    <thead class="text-xs uppercase bg-gray-700 text-gray-400 sticky top-0">
+                        <tr>
+                            <th class="px-3 py-2 cursor-pointer" onclick="renderAdmin('date')">Waktu Selesai ↕</th>
+                            <th class="px-3 py-2 cursor-pointer" onclick="renderAdmin('name')">Nama ↕</th>
+                            <th class="px-3 py-2">Kelas</th>
+                            <th class="px-3 py-2">Sekolah</th>
+                            <th class="px-3 py-2 cursor-pointer" onclick="renderAdmin('score')">Skor ↕</th>
+                            <th class="px-3 py-2">B/S</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-body">
+                        <!-- Injected -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Data Bank (Strictly 50 Questions representing 11 Topics)
+        const rawQuestions = [
+            // --- KARMA PHALA (5) ---
+            { id: 1, materi: "Karma Phala", tingkat_kesulitan: "sedang", level_kognitif: "C2", stimulus: "Wayan mendapatkan hadiah sepeda dari orang tuanya karena ia selalu rajin membantu membersihkan rumah setiap hari.", pertanyaan: "Penerimaan hasil perbuatan yang langsung dirasakan pada kehidupan saat ini juga disebut...", options: { A: "Sancita Karma Phala", B: "Prarabdha Karma Phala", C: "Kriyamana Karma Phala", D: "Niskama Karma" }, correctAnswer: "B", explanation: "Prarabdha Karma Phala artinya perbuatan yang dilakukan pada kehidupan sekarang dan dinikmati di kehidupan sekarang juga.", source: "Buku Siswa Pendidikan Agama Hindu dan Budi Pekerti SMA Kelas X", sourceChapter: "Bab II Hukum Karma Phala" },
+            { id: 2, materi: "Karma Phala", tingkat_kesulitan: "sulit", level_kognitif: "C4", stimulus: "Seseorang dilahirkan dalam keadaan cacat fisik bawaan, meskipun selama hidupnya saat ini ia selalu berbuat baik dan tekun beribadah.", pertanyaan: "Berdasarkan ajaran Hindu, kondisi cacat bawaan yang dibawa sejak lahir tersebut paling tepat dianalisis sebagai akibat dari...", options: { A: "Kriyamana Karma Phala yang belum matang", B: "Sancita Karma Phala dari kehidupan masa lalu", C: "Hukuman dari Sang Hyang Widhi secara langsung", D: "Prarabdha Karma Phala dari perbuatan saat ini" }, correctAnswer: "B", explanation: "Sancita Karma Phala artinya perbuatan di kehidupan sebelumnya yang diterima dan menentukan kondisi di kehidupan sekarang.", source: "Buku Siswa Pendidikan Agama Hindu SMA Kelas X", sourceChapter: "Bab II" },
+            { id: 3, materi: "Karma Phala", tingkat_kesulitan: "sedang", level_kognitif: "C3", stimulus: "Sebagai siswa SMA, Made menyadari ajaran Hukum Karma. Ia menolong teman yang kesusahan tanpa mengharapkan pujian dari guru atau imbalan.", pertanyaan: "Tindakan Made mencerminkan penerapan dari konsep...", options: { A: "Sakama Karma", B: "Niskama Karma", C: "Sancita Karma", D: "Kriyamana Karma" }, correctAnswer: "B", explanation: "Niskama Karma adalah melakukan perbuatan (karma) dengan tulus ikhlas tanpa terikat atau mengharapkan hasil (phala).", source: "Buku Siswa Pendidikan Agama Hindu SMA", sourceChapter: "Konsep Karma Yoga" },
+            { id: 4, materi: "Karma Phala", tingkat_kesulitan: "sulit", level_kognitif: "C5", stimulus: "Pernyataan 1: Hukum Karma mutlak menentukan nasib manusia tanpa bisa diubah. Pernyataan 2: Manusia diberi kebebasan bertindak (wiweka) untuk memperbaiki karmanya.", pertanyaan: "Evaluasi yang tepat terhadap kedua pernyataan di atas berdasarkan filsafat Hindu adalah...", options: { A: "Pernyataan 1 benar mutlak, pernyataan 2 salah.", B: "Keduanya salah, nasib ditentukan sepenuhnya oleh dewa.", C: "Pernyataan 1 salah karena manusia memiliki kehendak bebas (pernyataan 2 benar) untuk membentuk nasib masa depan.", D: "Keduanya benar dan saling mendukung tanpa paradoks." }, correctAnswer: "C", explanation: "Agama Hindu mengajarkan bahwa meski masa lalu menentukan masa kini, manusia dikaruniai akal (wiweka) untuk berbuat baik masa kini demi mengubah karma masa depan.", source: "Buku Panduan Guru Pendidikan Agama Hindu SMA", sourceChapter: "Kebebasan Bertindak" },
+            { id: 5, materi: "Karma Phala", tingkat_kesulitan: "sedang", level_kognitif: "C2", stimulus: "Seseorang terus berbuat baik sepanjang hidupnya saat ini, namun hasilnya belum ia rasakan hingga akhir hayatnya.", pertanyaan: "Berdasarkan Hukum Karma, hasil perbuatan yang dilakukan di kehidupan sekarang namun baru akan diterima pada kehidupan selanjutnya disebut...", options: { A: "Sancita Karma Phala", B: "Prarabdha Karma Phala", C: "Kriyamana Karma Phala", D: "Asubha Karma" }, correctAnswer: "C", explanation: "Kriyamana Karma Phala artinya perbuatan di kehidupan sekarang yang hasilnya akan diterima di kehidupan selanjutnya.", source: "Buku Siswa Pendidikan Agama Hindu SMA Kelas X", sourceChapter: "Bab II" },
+
+            // --- PUNARBHAWA (5) ---
+            { id: 6, materi: "Punarbhawa", tingkat_kesulitan: "sedang", level_kognitif: "C2", stimulus: "Agama Hindu meyakini bahwa roh akan terus menerus mengalami proses kelahiran kembali berulang-ulang ke dunia fana ini.", pertanyaan: "Proses kelahiran yang berulang-ulang karena keterikatan roh pada hal duniawi disebut...", options: { A: "Moksa", B: "Dharma", C: "Samsara", D: "Karma" }, correctAnswer: "C", explanation: "Samsara (Punarbhawa) adalah lingkaran kelahiran, kehidupan, dan kematian yang berulang-ulang akibat ketidaksempurnaan atman.", source: "Buku Siswa Pendidikan Agama Hindu SMA Kelas X", sourceChapter: "Bab Punarbhawa" },
+            { id: 7, materi: "Punarbhawa", tingkat_kesulitan: "sulit", level_kognitif: "C4", stimulus: "Sloka dalam Bhagawadgita menyebutkan: 'Sama seperti manusia membuang pakaian yang usang dan mengenakan yang baru, demikian pula roh (Atman) meninggalkan badan jasmani yang usang'.", pertanyaan: "Analisis makna terdalam dari analogi 'pakaian' dalam sloka tersebut berkaitan dengan Punarbhawa adalah...", options: { A: "Badan jasmani bersifat kekal bersama dengan Atman.", B: "Atman dapat dihancurkan bersamaan dengan rusaknya badan fisik.", C: "Badan fisik hanyalah wadah sementara (wadag) yang bisa berganti, sedangkan Atman abadi.", D: "Atman harus menderita selamanya karena menggunakan pakaian fisik." }, correctAnswer: "C", explanation: "Analogi pakaian menegaskan bahwa kematian hanyalah pelepasan badan fisik yang fana (Stula Sarira), sementara Atman tetap abadi dan berpindah ke badan baru.", source: "Bhagawadgita II.22 (Buku Teks Pemerintah)", sourceChapter: "Sifat Atman" },
+            { id: 8, materi: "Punarbhawa", tingkat_kesulitan: "sedang", level_kognitif: "C3", stimulus: "Menyadari bahwa kelahiran adalah kesempatan untuk memperbaiki diri, seorang remaja Hindu mengisi waktu luangnya dengan belajar dan pelayanan sosial.", pertanyaan: "Sikap remaja tersebut menunjukkan pemahaman bahwa tujuan utama dilahirkan kembali menjadi manusia (manusya) adalah untuk...", options: { A: "Menikmati kesenangan duniawi sebanyak-banyaknya.", B: "Memperbaiki karma dan mencapai kesempurnaan (Moksa).", C: "Menunggu waktu hingga kiamat tiba.", D: "Menghukum diri sendiri atas dosa masa lalu." }, correctAnswer: "B", explanation: "Menjelma menjadi manusia dipandang sebagai anugerah tertinggi karena hanya manusia yang memiliki idep (pikiran) untuk melebur karma buruk menuju Moksa (Subha Karma).", source: "Sarasamuscaya 2 (Buku Teks Pemerintah)", sourceChapter: "Keutamaan Menjadi Manusia" },
+            { id: 9, materi: "Punarbhawa", tingkat_kesulitan: "sulit", level_kognitif: "C5", stimulus: "Dua tokoh Hindu berdebat. Tokoh A menyatakan Punarbhawa adalah hukuman bagi roh. Tokoh B menyatakan Punarbhawa adalah peluang/kasih sayang Tuhan.", pertanyaan: "Berdasarkan ajaran tattwa Hindu, evaluasi manakah yang paling benar secara konseptual?", options: { A: "Pernyataan Tokoh A benar, karena dunia adalah tempat penderitaan mutlak.", B: "Pernyataan Tokoh B benar, karena memberi kesempatan Atman menyucikan diri secara bertahap.", C: "Keduanya salah, karena Tuhan tidak ikut campur dalam urusan roh.", D: "Keduanya benar, tergantung kasta kelahiran seseorang." }, correctAnswer: "B", explanation: "Punarbhawa bukan sekadar hukuman, melainkan manifestasi keadilan dan kasih Tuhan yang memberi waktu bagi roh berevolusi spiritual hingga mencapai kesempurnaan.", source: "Buku Panduan Guru Agama Hindu", sourceChapter: "Filosofi Punarbhawa" },
+            { id: 10, materi: "Punarbhawa", tingkat_kesulitan: "sedang", level_kognitif: "C2", stimulus: "Dalam proses reinkarnasi, roh (Atman) masih diselimuti oleh badan halus yang membawa sifat, karakter, dan hasil karma (karmawasana).", pertanyaan: "Badan halus yang menyertai Atman saat berpindah ke badan jasmani baru disebut...", options: { A: "Stula Sarira", B: "Karana Sarira", C: "Suksma Sarira", D: "Antahkarana" }, correctAnswer: "C", explanation: "Suksma Sarira adalah badan astral/halus yang membungkus Atman, menyimpan rekaman pikiran dan karma (Karmawasana) yang menentukan kelahiran berikutnya.", source: "Buku Siswa Pendidikan Agama Hindu SMA", sourceChapter: "Tri Sarira" },
+
+            // --- MOKSA (4) ---
+            { id: 11, materi: "Moksa", tingkat_kesulitan: "sedang", level_kognitif: "C2", stimulus: "Tujuan akhir kehidupan umat Hindu adalah mencapai kebahagiaan abadi, bersatunya Atman dengan Brahman.", pertanyaan: "Tingkatan moksa di mana seseorang telah mencapai kebebasan spiritual atau pencerahan saat ia masih hidup di dunia jasmani disebut...", options: { A: "Jiwan Mukti", B: "Videha Mukti", C: "Purna Mukti", D: "Salokya" }, correctAnswer: "A", explanation: "Jiwan Mukti adalah kebebasan jiwa yang dicapai seseorang semasa ia masih hidup secara fisik (misalnya para Maharsi/Orang Suci).", source: "Buku Siswa Pendidikan Agama Hindu SMA Kelas XII", sourceChapter: "Tingkatan Moksa" },
+            { id: 12, materi: "Moksa", tingkat_kesulitan: "sulit", level_kognitif: "C4", stimulus: "Catur Purusartha memuat Dharma, Artha, Kama, dan Moksa. Seorang pengusaha sukses berpendapat bahwa ia akan mengabaikan Artha dan Kama dan langsung fokus meditasi mencari Moksa di usia muda.", pertanyaan: "Analisis logis berdasarkan hierarki Catur Purusartha terhadap keputusan pengusaha tersebut adalah...", options: { A: "Tepat, karena Artha dan Kama adalah penghalang absolut menuju Moksa.", B: "Kurang tepat, karena Artha dan Kama perlu dipenuhi terlebih dahulu dengan landasan Dharma sebelum fokus penuh ke Moksa.", C: "Sangat tepat, karena Moksa tidak memerlukan Dharma.", D: "Tidak tepat, karena Moksa hanya diperuntukkan bagi pendeta (Sulinggih)." }, correctAnswer: "B", explanation: "Moksa adalah tujuan akhir, namun tahapan kehidupan (Asrama) dan pencapaiannya (Artha, Kama) harus dilalui secara bertahap dan selalu berlandaskan Dharma (kebenaran).", source: "Buku Siswa Pendidikan Agama Hindu SMA", sourceChapter: "Catur Purusartha" },
+            { id: 13, materi: "Moksa", tingkat_kesulitan: "sedang", level_kognitif: "C3", stimulus: "Bhagawadgita menyebutkan empat jalan menuju Tuhan (Moksa) yang disesuaikan dengan bakat dan temperamen manusia.", pertanyaan: "Seorang ilmuwan yang tekun mempelajari sastra suci, filsafat, dan hakekat kebenaran untuk mencapai pencerahan sedang menempuh jalan...", options: { A: "Bhakti Yoga", B: "Karma Yoga", C: "Jnana Yoga", D: "Raja Yoga" }, correctAnswer: "C", explanation: "Jnana Yoga adalah jalan pencapaian Moksa melalui pengetahuan spiritual, kebijaksanaan, dan pemahaman filosofis yang mendalam.", source: "Buku Siswa Pendidikan Agama Hindu SMA Kelas XI", sourceChapter: "Catur Marga Yoga" },
+            { id: 14, materi: "Moksa", tingkat_kesulitan: "sulit", level_kognitif: "C5", stimulus: "Seseorang berpandangan bahwa Moksa berarti lenyapnya eksistensi roh hingga menjadi ketiadaan mutlak (Nihilisme).", pertanyaan: "Sebagai siswa Hindu, argumen evaluasi untuk meluruskan pandangan tersebut berdasarkan filsafat Vedanta adalah...", options: { A: "Benar, Moksa berarti kematian dan hilangnya segala kesadaran.", B: "Salah, Moksa bukan ketiadaan, melainkan pencapaian kesadaran tertinggi (Sat-Cit-Ananda) dan kemanunggalan dengan Brahman.", C: "Salah, karena Atman akan pergi ke surga (Swarga Loka) secara fisik untuk selamanya.", D: "Benar, Moksa adalah kekosongan hampa tanpa rasa bahagia." }, correctAnswer: "B", explanation: "Dalam Hindu, Moksa bukan kehampaan, melainkan 'Sat-Cit-Ananda' (Kebenaran, Kesadaran, Kebahagiaan Absolut) akibat penyatuan dengan Hyang Widhi.", source: "Buku Teks Pendidikan Agama Hindu SMA Kelas XII", sourceChapter: "Konsep Moksa" },
+
+            // --- YADNYA (5) ---
+            { id: 15, materi: "Yadnya", tingkat_kesulitan: "sedang", level_kognitif: "C2", stimulus: "Sebagai bentuk rasa syukur atas kehidupan dan pelestarian alam, umat Hindu mempersembahkan banten pada hari raya Tumpek Wariga.", pertanyaan: "Pelaksanaan upacara yang ditujukan kepada tumbuh-tumbuhan merupakan bagian dari...", options: { A: "Dewa Yadnya", B: "Pitra Yadnya", C: "Bhuta Yadnya", D: "Manusa Yadnya" }, correctAnswer: "C", explanation: "Bhuta Yadnya adalah persembahan suci kepada alam semesta beserta isinya (sarwa prani), termasuk tumbuhan, hewan, dan kekuatan alam agar harmonis.", source: "Buku Siswa Pendidikan Agama Hindu", sourceChapter: "Panca Maha Yadnya" },
+            { id: 16, materi: "Yadnya", tingkat_kesulitan: "sulit", level_kognitif: "C4", stimulus: "Dalam Bhagawadgita III.14 disebutkan bahwa makhluk hidup lahir dari makanan, makanan berasal dari hujan, hujan berasal dari yadnya, dan yadnya lahir dari karma.", pertanyaan: "Makna filosofis 'yadnya' berdasarkan sloka tersebut dalam konteks pelestarian lingkungan adalah...", options: { A: "Yadnya hanya ritual pembakaran api untuk meminta hujan.", B: "Yadnya adalah siklus pengorbanan tulus (hukum alam) yang menjaga keseimbangan ekosistem dan kehidupan makrokosmos.", C: "Manusia harus memberikan makanan kepada dewa agar tidak mati kelaparan.", D: "Karma yang buruk akan menghentikan hujan secara instan." }, correctAnswer: "B", explanation: "Yadnya dalam pengertian luas adalah pengorbanan tulus/hukum keseimbangan. Alam bekerja dalam siklus yadnya (pengorbanan kosmis) agar kehidupan berlanjut.", source: "Bhagawadgita (Buku Pemerintah SMA)", sourceChapter: "Makna Yadnya" },
+            { id: 17, materi: "Yadnya", tingkat_kesulitan: "sedang", level_kognitif: "C3", stimulus: "Setiap pagi sebelum makan, Ni Luh selalu menyisihkan sedikit nasinya untuk dipersembahkan di halaman rumah (Ngejot/Saiban).", pertanyaan: "Tindakan Ni Luh tergolong ke dalam jenis yadnya yang dilaksanakan setiap hari, yaitu...", options: { A: "Naimittika Yadnya", B: "Kamya Yadnya", C: "Nitya Yadnya", D: "Atma Yadnya" }, correctAnswer: "C", explanation: "Nitya Yadnya adalah korban suci yang dilaksanakan secara rutin setiap hari, contohnya Puja Trisandya dan Yajña Sesa (Saiban/Ngejot).", source: "Buku Siswa Pendidikan Agama Hindu SMA", sourceChapter: "Waktu Pelaksanaan Yadnya" },
+            { id: 18, materi: "Yadnya", tingkat_kesulitan: "sulit", level_kognitif: "C6", stimulus: "Dalam kondisi pandemi atau krisis ekonomi, sebuah desa adat kesulitan membiayai upacara besar (Utama) seperti yang biasa dilakukan setiap tahun.", pertanyaan: "Solusi paling tepat berdasarkan konsep 'Kualitas Yadnya' (Satwika Yadnya) dalam susastra Hindu adalah...", options: { A: "Meminjam uang dengan bunga tinggi agar upacara tetap terlihat mewah (Utama).", B: "Meniadakan upacara sepenuhnya hingga ekonomi pulih puluhan tahun lagi.", C: "Melaksanakan upacara tingkat Nista (sederhana) dengan mengutamakan Lascarya (keikhlasan) dan sesuai kemampuan.", D: "Meminta bantuan pihak luar dan mengganti tujuan yadnya." }, correctAnswer: "C", explanation: "Hindu mengenal tingkatan Nista, Madya, Utama. Yang terpenting bukan kemewahan materi, melainkan 'Satwika Yadnya' (dilandasi keikhlasan/Lascarya, sastra, dan kemampuan).", source: "Buku Siswa Pendidikan Agama Hindu SMA", sourceChapter: "Syarat Satwika Yadnya" },
+            { id: 19, materi: "Yadnya", tingkat_kesulitan: "sedang", level_kognitif: "C2", stimulus: "Pelaksanaan upacara Ngaben di Bali bertujuan untuk menyucikan roh leluhur dan mengembalikan unsur Panca Maha Bhuta ke asalnya.", pertanyaan: "Upacara Ngaben merupakan implementasi dari ajaran...", options: { A: "Dewa Yadnya", B: "Rsi Yadnya", C: "Pitra Yadnya", D: "Bhuta Yadnya" }, correctAnswer: "C", explanation: "Pitra Yadnya adalah korban suci yang ditujukan kepada roh leluhur atau orang tua, termasuk upacara kematian dan penyucian roh (Ngaben).", source: "Buku Siswa Pendidikan Agama Hindu SMA", sourceChapter: "Bagian Panca Maha Yadnya" },
+
+            // --- KITAB UPAWEDA (4) ---
+            { id: 20, materi: "Kitab Upaweda", tingkat_kesulitan: "sedang", level_kognitif: "C2", stimulus: "Epos Mahabharata dan Ramayana sangat populer di Indonesia dan menjadi sumber nilai moral bagi umat Hindu.", pertanyaan: "Kedua epos besar tersebut di dalam kodifikasi Veda Smrti tergolong ke dalam bagian...", options: { A: "Purana", B: "Itihasa", C: "Ayur Veda", D: "Dhanur Veda" }, correctAnswer: "B", explanation: "Itihasa ('sesungguhnya kejadian itu begitulah nyatanya') adalah epos/wiracarita sejarah kepahlawanan Hindu, yang utama adalah Ramayana dan Mahabharata.", source: "Buku Siswa Pendidikan Agama Hindu SMA Kelas X", sourceChapter: "Kodifikasi Veda" },
+            { id: 21, materi: "Kitab Upaweda", tingkat_kesulitan: "sulit", level_kognitif: "C4", stimulus: "Kitab Ayur Veda tidak hanya berisi tentang mantra-mantra pengobatan, tetapi juga mencakup anatomi, pembedahan (Salya), dan ilmu meracik obat dari tumbuhan alami.", pertanyaan: "Berdasarkan fakta tersebut, kedudukan Ayur Veda dalam konstelasi ilmu pengetahuan Hindu menegaskan bahwa...", options: { A: "Agama Hindu hanya mengurusi alam gaib, bukan ilmu fisik.", B: "Veda bersifat komprehensif, memuat ilmu rohani (Apara Widya) sekaligus sains empiris/medis terapan.", C: "Pengobatan Hindu menolak penggunaan ilmu kedokteran rasional.", D: "Ayur Veda adalah cabang ilmu sihir kuno." }, correctAnswer: "B", explanation: "Ayur Veda membuktikan bahwa Veda (Upaweda) mencakup ilmu terapan rasional yang bertujuan menjaga kesehatan tubuh sebagai alat mencapai Moksa.", source: "Buku Panduan Guru Pendidikan Agama Hindu SMA", sourceChapter: "Ayur Veda sebagai Ilmu Medis" },
+            { id: 22, materi: "Kitab Upaweda", tingkat_kesulitan: "sedang", level_kognitif: "C2", stimulus: "Di samping Itihasa, terdapat kelompok kitab suci yang berisi cerita mitologi, penciptaan alam semesta, silsilah raja-raja, dan kisah para Dewa.", pertanyaan: "Kelompok kitab Upaweda yang dimaksud adalah...", options: { A: "Upanisad", B: "Purana", C: "Aranyaka", D: "Gandharwa Veda" }, correctAnswer: "B", explanation: "Purana artinya 'cerita zaman dahulu', memuat mitologi, kosmologi, dan silsilah dewa/raja sebagai alat untuk mempopulerkan ajaran Veda kepada masyarakat umum.", source: "Buku Siswa Pendidikan Agama Hindu SMA", sourceChapter: "Bagian Upaweda" },
+            { id: 23, materi: "Kitab Upaweda", tingkat_kesulitan: "sulit", level_kognitif: "C5", stimulus: "Terdapat pernyataan: 'Mempelajari Catur Veda (Sruti) sangat sulit tanpa memahami Itihasa dan Purana terlebih dahulu'.", pertanyaan: "Alasan pedagogis mengapa pernyataan tersebut dibenarkan dalam tradisi pengajaran Hindu adalah...", options: { A: "Karena Catur Veda sudah tidak relevan lagi.", B: "Karena Veda dilarang dibaca oleh sembarang orang.", C: "Karena Itihasa dan Purana menjelaskan kebenaran filosofis Veda yang rumit melalui narasi cerita dan teladan tokoh yang mudah dipahami.", D: "Karena Itihasa adalah satu-satunya kitab suci yang asli." }, correctAnswer: "C", explanation: "Veda Upabrahmana (Itihasa & Purana) berfungsi untuk 'memperbesar' atau menjelaskan ajaran Sruti yang abstrak ke dalam bentuk cerita moral yang aplikatif.", source: "Buku Teks Pemerintah", sourceChapter: "Fungsi Itihasa dan Purana" },
+
+            // --- HUKUM HINDU (5) ---
+            { id: 24, materi: "Hukum Hindu", tingkat_kesulitan: "sedang", level_kognitif: "C2", stimulus: "Dalam Manawa Dharmasastra (II.6) disebutkan sumber-sumber Hukum Hindu secara hierarkis.", pertanyaan: "Sumber hukum Hindu yang menempati urutan pertama dan tertinggi sebagai wahyu langsung dari Sang Hyang Widhi adalah...", options: { A: "Smrti", B: "Sila", C: "Acara", D: "Sruti (Veda)" }, correctAnswer: "D", explanation: "Sruti adalah wahyu suci yang didengar langsung oleh para Maharsi, menjadi sumber kebenaran tertinggi dalam hukum Hindu (Vedo'khilo dharma mulam).", source: "Buku Siswa Pendidikan Agama Hindu SMA Kelas XII", sourceChapter: "Sumber Hukum Hindu" },
+            { id: 25, materi: "Hukum Hindu", tingkat_kesulitan: "sulit", level_kognitif: "C4", stimulus: "Sebuah tradisi (Acara/Dresta) di suatu wilayah bertentangan secara diam-diam dengan nilai-nilai kemanusiaan yang diajarkan dalam kitab suci Veda (Sruti).", pertanyaan: "Berdasarkan hierarki sumber Hukum Hindu menurut Manu, tindakan yang tepat untuk menyikapi tradisi tersebut adalah...", options: { A: "Tradisi tetap dipertahankan karena lebih mengakar di masyarakat.", B: "Tradisi harus dievaluasi dan diluruskan karena kedudukan Acara tidak boleh bertentangan dengan Sruti dan Smrti.", C: "Menunggu turunnya wahyu baru untuk menghapus tradisi.", D: "Menyalahkan para Maharsi yang menyusun kitab suci." }, correctAnswer: "B", explanation: "Hierarki hukum Manu: Sruti -> Smrti -> Sila -> Acara -> Atmanastusti. Hukum di bawahnya batal/harus disesuaikan jika bertentangan dengan hukum di atasnya (Sruti/Veda).", source: "Buku Siswa Pendidikan Agama Hindu SMA", sourceChapter: "Tata Urutan Hukum Hindu" },
+            { id: 26, materi: "Hukum Hindu", tingkat_kesulitan: "sedang", level_kognitif: "C3", stimulus: "Ketika menghadapi dilema moral dan tidak menemukan panduan spesifik dalam sastra, seseorang akhirnya mengambil keputusan berdasarkan bisikan hati nuraninya yang bersih.", pertanyaan: "Dalam sumber Hukum Hindu, pengambilan keputusan berdasarkan kepuasan hati nurani yang suci disebut...", options: { A: "Sruti", B: "Smrti", C: "Acara", D: "Atmanastusti" }, correctAnswer: "D", explanation: "Atmanastusti adalah rasa puas pada diri sendiri / hati nurani yang suci. Ini adalah sumber hukum terakhir ketika teks atau tradisi tidak memberikan jawaban pasti.", source: "Buku Siswa Pendidikan Agama Hindu SMA Kelas XII", sourceChapter: "Atmanastusti" },
+            { id: 27, materi: "Hukum Hindu", tingkat_kesulitan: "sulit", level_kognitif: "C5", stimulus: "Hukum Hindu mengenal konsep 'Yuga Dharma' (hukum yang berlaku sesuai zamannya). Misalnya, aturan hukum pada zaman Satyayuga berbeda dengan Kaliyuga.", pertanyaan: "Kesimpulan logis dari penerapan konsep Yuga Dharma ini terhadap Hukum Hindu adalah...", options: { A: "Hukum Hindu bersifat sangat kaku dan tidak bisa berubah (statis).", B: "Hukum Hindu bersifat fleksibel, dinamis, dan adaptif terhadap perubahan ruang (Desa), waktu (Kala), dan kondisi (Patra).", C: "Hukum Hindu telah usang dan harus diganti dengan hukum barat sepenuhnya.", D: "Setiap individu boleh membuat hukum Veda versi mereka sendiri." }, correctAnswer: "B", explanation: "Hukum Hindu bersifat dinamis (Desa, Kala, Patra). Ajaran esensial (Tattwa) tetap, namun pelaksanaannya (Susila/Acara) dapat beradaptasi dengan zaman (Yuga).", source: "Buku Teks Agama Hindu SMA Kelas XII", sourceChapter: "Dinamika Hukum Hindu" },
+            { id: 28, materi: "Hukum Hindu", tingkat_kesulitan: "sedang", level_kognitif: "C2", stimulus: "Buku pedoman hukum Hindu klasik yang paling terkenal dan banyak menjadi rujukan dalam menyusun tata negara di masa kerajaan Hindu di Nusantara adalah...", pertanyaan: "Kitab hukum susunan Bhagawan Manu tersebut dinamakan...", options: { A: "Arthasastra", B: "Sarasamuscaya", C: "Manawa Dharmasastra", D: "Nitisastra" }, correctAnswer: "C", explanation: "Manawa Dharmasastra adalah kompendium (kumpulan) hukum Hindu (Smrti/Dharmasastra) yang paling komprehensif, disusun oleh Bhagawan Manu.", source: "Buku Siswa Pendidikan Agama Hindu SMA Kelas XII", sourceChapter: "Dharmasastra" },
+
+            // --- DARSANA (4) ---
+            { id: 29, materi: "Darsana", tingkat_kesulitan: "sedang", level_kognitif: "C2", stimulus: "Filsafat Hindu (Darsana) terbagi menjadi dua kelompok besar, yaitu Astika (mengakui otoritas Veda) dan Nastika (menolak otoritas Veda).", pertanyaan: "Manakah dari sistem filsafat berikut yang termasuk dalam kelompok Sad Darsana (Astika)?", options: { A: "Carvaka", B: "Buddha", C: "Jaina", D: "Samkhya" }, correctAnswer: "D", explanation: "Sad Darsana (6 aliran Astika) meliputi: Nyaya, Vaisesika, Samkhya, Yoga, Mimamsa, dan Vedanta. Carvaka, Buddha, Jaina adalah Nastika.", source: "Buku Siswa Pendidikan Agama Hindu SMA Kelas X", sourceChapter: "Pengantar Darsana" },
+            { id: 30, materi: "Darsana", tingkat_kesulitan: "sulit", level_kognitif: "C4", stimulus: "Sistem filsafat Nyaya mendasarkan kebenaran pada empat pramana (sumber pengetahuan valid): Pratyaksa (pengamatan), Anumana (penyimpulan), Upamana (perbandingan), dan Sabda (kesaksian).", pertanyaan: "Jika seseorang meyakini adanya api di bukit karena melihat asap tebal dari kejauhan, ia sedang menggunakan metode logika...", options: { A: "Pratyaksa Pramana", B: "Anumana Pramana", C: "Upamana Pramana", D: "Sabda Pramana" }, correctAnswer: "B", explanation: "Anumana Pramana adalah inferensi/penyimpulan. Melihat asap (akibat) disimpulkan pasti ada api (sebab) meski apinya tidak terlihat langsung.", source: "Buku Teks Pendidikan Agama Hindu SMA Kelas X", sourceChapter: "Nyaya Darsana" },
+            { id: 31, materi: "Darsana", tingkat_kesulitan: "sedang", level_kognitif: "C2", stimulus: "Filsafat ini sangat menekankan praktik pengendalian pikiran, pernafasan, dan postur tubuh untuk mencapai penyatuan (Moksa). Pendirinya adalah Maharsi Patanjali.", pertanyaan: "Aliran Darsana yang dimaksud adalah...", options: { A: "Yoga Darsana", B: "Mimamsa Darsana", C: "Vaisesika Darsana", D: "Vedanta Darsana" }, correctAnswer: "A", explanation: "Yoga Darsana, didirikan oleh Maharsi Patanjali (Yoga Sutra), adalah sistem filsafat praktis yang berfokus pada pengendalian Citta (pikiran) melalui Astangga Yoga.", source: "Buku Siswa Pendidikan Agama Hindu SMA Kelas X", sourceChapter: "Yoga Darsana" },
+            { id: 32, materi: "Darsana", tingkat_kesulitan: "sulit", level_kognitif: "C5", stimulus: "Samkhya Darsana mengajarkan bahwa alam semesta terbentuk dari pertemuan antara Purusa (kesadaran mutlak rohani) dan Prakrti (materi primordial).", pertanyaan: "Dari pandangan Samkhya tersebut, bagaimana relasi ontologis antara roh (Purusa) dengan benda (Prakrti) sebelum terjadinya penciptaan?", options: { A: "Keduanya saling menghancurkan.", B: "Prakrti menciptakan Purusa.", C: "Keduanya berdiri sendiri secara terpisah sebagai asas tunggal yang tak berawal.", D: "Purusa membutuhkan Prakrti untuk bisa hidup." }, correctAnswer: "C", explanation: "Samkhya bersifat dualistik (Dvaita). Purusa (Roh/Kesadaran) dan Prakrti (Materi) adalah entitas kekal yang terpisah. Pertemuan keduanya baru memicu evolusi alam.", source: "Buku Panduan Guru Agama Hindu", sourceChapter: "Samkhya Darsana" },
+
+            // --- PANCA MAYA KOSA (4) ---
+            { id: 33, materi: "Panca Maya Kosa", tingkat_kesulitan: "sedang", level_kognitif: "C2", stimulus: "Ajaran Vedanta menyebutkan bahwa Atman pada tubuh manusia dibungkus oleh lima lapisan pelindung yang disebut Panca Maya Kosa.", pertanyaan: "Lapisan pembungkus Atman yang terbentuk dari sari-sari makanan fisik yang kita konsumsi disebut...", options: { A: "Pranamaya Kosa", B: "Annamaya Kosa", C: "Manomaya Kosa", D: "Vijnanamaya Kosa" }, correctAnswer: "B", explanation: "Annamaya Kosa adalah lapisan badan fisik terdalam yang terbentuk dan dipelihara oleh unsur makanan (Anna).", source: "Buku Siswa Pendidikan Agama Hindu SMA Kelas XI", sourceChapter: "Panca Maya Kosa" },
+            { id: 34, materi: "Panca Maya Kosa", tingkat_kesulitan: "sulit", level_kognitif: "C4", stimulus: "Seseorang sering mengalami stres, emosi yang tidak stabil, dan halusinasi karena sering berpikir negatif dan berkhayal.", pertanyaan: "Dalam sistem Panca Maya Kosa, lapisan pembungkus mana yang mengalami gangguan dominan pada kasus orang tersebut?", options: { A: "Annamaya Kosa", B: "Pranamaya Kosa", C: "Manomaya Kosa", D: "Anandamaya Kosa" }, correctAnswer: "C", explanation: "Manomaya Kosa adalah lapisan pikiran, emosi, dan mental. Jika pikiran kacau atau stres, lapisan ini yang terganggu.", source: "Buku Siswa Pendidikan Agama Hindu SMA", sourceChapter: "Fungsi Lapisan Pembungkus" },
+            { id: 35, materi: "Panca Maya Kosa", tingkat_kesulitan: "sedang", level_kognitif: "C2", stimulus: "Latihan pernafasan (Pranayama) sangat baik untuk kesehatan fisik maupun mental karena mengatur aliran energi vital (Prana) dalam tubuh.", pertanyaan: "Latihan ini secara langsung bertujuan memelihara dan menyeimbangkan lapisan...", options: { A: "Vijnanamaya Kosa", B: "Anandamaya Kosa", C: "Pranamaya Kosa", D: "Annamaya Kosa" }, correctAnswer: "C", explanation: "Pranamaya Kosa adalah lapisan energi (prana) atau nafas kehidupan yang membungkus badan fisik dan menghubungkannya dengan pikiran.", source: "Buku Siswa Pendidikan Agama Hindu SMA", sourceChapter: "Pranamaya Kosa" },
+            { id: 36, materi: "Panca Maya Kosa", tingkat_kesulitan: "sulit", level_kognitif: "C5", stimulus: "Seorang Yogi masuk dalam samadhi yang dalam. Ia tidak lagi terpengaruh oleh rasa sakit fisik (Annamaya) atau kekacauan emosi (Manomaya), melainkan merasakan kebahagiaan sejati.", pertanyaan: "Kondisi kebahagiaan rohani absolut sang Yogi membuktikan bahwa kesadarannya telah mencapai lapisan pembungkus Atman yang paling halus, yaitu...", options: { A: "Vijnanamaya Kosa", B: "Anandamaya Kosa", C: "Pranamaya Kosa", D: "Manomaya Kosa" }, correctAnswer: "B", explanation: "Anandamaya Kosa adalah lapisan kebahagiaan transendental, lapisan paling halus dan dekat dengan Atman, bebas dari penderitaan duniawi.", source: "Buku Teks Pendidikan Agama Hindu SMA", sourceChapter: "Anandamaya Kosa" },
+
+            // --- PANCA MAHA BHUTA (5) ---
+            { id: 37, materi: "Panca Maha Bhuta", tingkat_kesulitan: "sedang", level_kognitif: "C2", stimulus: "Alam semesta (makrokosmos/Bhuana Agung) dan tubuh manusia (mikrokosmos/Bhuana Alit) dibentuk oleh lima unsur materi dasar yang disebut Panca Maha Bhuta.", pertanyaan: "Unsur zat cair (air) yang membentuk darah, keringat, dan cairan tubuh lainnya disebut...", options: { A: "Pertiwi", B: "Apah", C: "Teja", D: "Bayu" }, correctAnswer: "B", explanation: "Apah adalah unsur zat cair dalam alam semesta dan tubuh manusia.", source: "Buku Siswa Pendidikan Agama Hindu SMA Kelas X", sourceChapter: "Panca Maha Bhuta" },
+            { id: 38, materi: "Panca Maha Bhuta", tingkat_kesulitan: "sulit", level_kognitif: "C4", stimulus: "Pemangku menggunakan sarana Dupa dan Api saat melaksanakan pemujaan (Nganteb Banten). Api tersebut menjadi saksi suci.", pertanyaan: "Penggunaan api dalam ritual Hindu berkorelasi secara mikrokosmos dengan unsur...", options: { A: "Pertiwi yang membentuk tulang", B: "Apah yang menyucikan pikiran", C: "Teja yang melambangkan cahaya kesadaran dan panas tubuh", D: "Akasa yang memberikan ruang kosong" }, correctAnswer: "C", explanation: "Teja adalah unsur cahaya/panas (api). Secara mikrokosmos, Teja adalah panas tubuh dan cahaya kesadaran/kecerdasan intelektual.", source: "Buku Siswa Agama Hindu SMA", sourceChapter: "Makna Simbolis Unsur Alam" },
+            { id: 39, materi: "Panca Maha Bhuta", tingkat_kesulitan: "sedang", level_kognitif: "C2", stimulus: "Ruang hampa di alam semesta yang menjadi tempat beredarnya planet-planet, serta rongga dalam tubuh manusia (rongga dada, mulut).", pertanyaan: "Hal tersebut merupakan perwujudan dari unsur...", options: { A: "Pertiwi", B: "Bayu", C: "Akasa", D: "Teja" }, correctAnswer: "C", explanation: "Akasa adalah unsur ether/ruang kosong yang mewadahi unsur-unsur materi lainnya.", source: "Buku Siswa Pendidikan Agama Hindu SMA Kelas X", sourceChapter: "Akasa" },
+            { id: 40, materi: "Panca Maha Bhuta", tingkat_kesulitan: "sulit", level_kognitif: "C5", stimulus: "Pembakaran mayat (Ngaben) menggunakan api (Teja) mengubah wujud padat (Pertiwi) menjadi debu, memuapkan zat cair (Apah), mengembalikan udara (Bayu) dari nafas, ke ruang kosong (Akasa).", pertanyaan: "Fungsi utama unsur Teja (api) dalam konteks ritual Ngaben berdasarkan analisis tattwa Panca Maha Bhuta adalah...", options: { A: "Sebagai agen pelebur (pemusnah) untuk mempercepat proses pengembalian unsur Panca Maha Bhuta ke asalnya (Bhuana Agung).", B: "Untuk menghukum roh yang banyak berbuat dosa.", C: "Sekadar tradisi tanpa dasar filosofi material.", D: "Untuk memanggil para dewa yang berdiam di matahari." }, correctAnswer: "A", explanation: "Api (Teja/Agni) berfungsi sebagai sarana Pralina (pelebur) cepat yang memecah ikatan Panca Maha Bhuta pada jenazah agar kembali ke alam semesta (Bhuana Agung).", source: "Buku Panduan Guru Pendidikan Agama Hindu", sourceChapter: "Makna Ngaben" },
+            { id: 41, materi: "Panca Maha Bhuta", tingkat_kesulitan: "sedang", level_kognitif: "C2", stimulus: "Tulang, gigi, otot, dan organ tubuh padat pada manusia sejatinya berasal dari unsur tanah.", pertanyaan: "Dalam istilah Sansekerta, unsur padat/tanah ini disebut...", options: { A: "Pertiwi", B: "Apah", C: "Bayu", D: "Akasa" }, correctAnswer: "A", explanation: "Pertiwi adalah unsur zat padat pembentuk materi fisik bumi dan bagian tubuh yang keras (tulang, gigi, daging).", source: "Buku Siswa Pendidikan Agama Hindu SMA Kelas X", sourceChapter: "Pertiwi" },
+
+            // --- SAPTA TIMIRA (4) ---
+            { id: 42, materi: "Sapta Timira", tingkat_kesulitan: "sedang", level_kognitif: "C2", stimulus: "Sapta Timira adalah tujuh macam sifat kegelapan (kemabukan) yang dapat menyesatkan manusia apabila tidak dikendalikan.", pertanyaan: "Kemabukan atau kesombongan karena merasa diri memiliki rupa yang sangat tampan atau cantik disebut...", options: { A: "Surupa", B: "Dhana", C: "Guna", D: "Yowana" }, correctAnswer: "A", explanation: "Surupa timira adalah sifat angkuh/mabuk karena keindahan fisik/wajah tampan atau cantik.", source: "Buku Siswa Pendidikan Agama Hindu SMA Kelas X", sourceChapter: "Sapta Timira" },
+            { id: 43, materi: "Sapta Timira", tingkat_kesulitan: "sulit", level_kognitif: "C4", stimulus: "Seorang pejabat tinggi negara yang memiliki kepintaran dan gelar akademik berderet justru tertangkap tangan melakukan korupsi secara licik.", pertanyaan: "Berdasarkan ajaran Sapta Timira, pejabat tersebut dikuasai oleh kegelapan yang bersumber dari...", options: { A: "Kulina (keturunan)", B: "Guna (kepandaian/ilmu)", C: "Sura (minuman keras)", D: "Kasuran (keberanian fisik)" }, correctAnswer: "B", explanation: "Guna timira adalah kemabukan/kesombongan karena kepandaian. Orang pandai yang tidak bermoral akan menggunakan ilmunya untuk kejahatan lincah (korupsi).", source: "Buku Siswa Pendidikan Agama Hindu SMA", sourceChapter: "Guna Timira" },
+            { id: 44, materi: "Sapta Timira", tingkat_kesulitan: "sedang", level_kognitif: "C3", stimulus: "Kelompok remaja terlibat tawuran dan balap liar di jalanan raya karena merasa fisiknya kuat dan berjiwa muda.", pertanyaan: "Perilaku negatif remaja tersebut merupakan bentuk kemabukan karena masa muda, yang disebut...", options: { A: "Surupa", B: "Dhana", C: "Yowana", D: "Kulina" }, correctAnswer: "C", explanation: "Yowana timira adalah kemabukan atau lepas kendali akibat gejolak darah muda (masa remaja/pemuda).", source: "Buku Siswa Pendidikan Agama Hindu SMA", sourceChapter: "Yowana Timira" },
+            { id: 45, materi: "Sapta Timira", tingkat_kesulitan: "sulit", level_kognitif: "C5", stimulus: "Terdapat orang yang gemar berjudi, pamer harta di media sosial (flexing), dan merendahkan orang miskin, padahal harta itu berasal dari warisan orang tuanya.", pertanyaan: "Orang tersebut mengalami kompleks kemabukan ganda (kombinasi) dari dua bagian Sapta Timira, yaitu...", options: { A: "Surupa (wajah) dan Guna (kepandaian)", B: "Dhana (kekayaan) dan Kulina (keturunan)", C: "Sura (minuman) dan Kasuran (keberanian)", D: "Yowana (usia) dan Surupa (wajah)" }, correctAnswer: "B", explanation: "Dhana adalah mabuk harta benda, sedangkan Kulina adalah mabuk keturunan bangsawan/keluarga kaya (mewarisi harta orang tua tanpa kerja keras).", source: "Buku Panduan Guru Pendidikan Agama Hindu SMA", sourceChapter: "Analisis Sapta Timira" },
+
+            // --- ASTANGGA YOGA (5) ---
+            { id: 46, materi: "Astangga Yoga", tingkat_kesulitan: "sedang", level_kognitif: "C2", stimulus: "Astangga Yoga adalah delapan tahapan pengendalian diri untuk mencapai Moksa (Samadhi) yang dirumuskan oleh Maharsi Patanjali.", pertanyaan: "Tahapan pertama berupa pengendalian diri tingkat jasmani (sosial), seperti tidak membunuh (Ahimsa) dan tidak mencuri (Asteya), disebut...", options: { A: "Yama", B: "Niyama", C: "Asana", D: "Pranayama" }, correctAnswer: "A", explanation: "Yama (Yama Brata) adalah tahapan pertama, yakni disiplin moral eksternal atau larangan-larangan dasar dalam bermasyarakat.", source: "Buku Siswa Pendidikan Agama Hindu SMA Kelas X", sourceChapter: "Astangga Yoga" },
+            { id: 47, materi: "Astangga Yoga", tingkat_kesulitan: "sulit", level_kognitif: "C4", stimulus: "Seorang Yogi sedang duduk diam dengan sikap padmasana. Matanya terpejam dan nafasnya teratur. Namun, di dalam kepalanya, ia masih memikirkan pekerjaan kantornya besok.", pertanyaan: "Secara teknis Astangga Yoga, sang Yogi gagal mengimplementasikan tahapan...", options: { A: "Asana, karena duduknya pasti salah.", B: "Pranayama, karena nafasnya masih ada.", C: "Pratyahara, karena indrianya (pikiran) masih terikat pada objek luar (pekerjaan).", D: "Yama, karena ia telah mencuri waktu." }, correctAnswer: "C", explanation: "Pratyahara adalah penarikan indria (fokus) dari objek duniawi. Jika pikiran masih melayang ke urusan dunia, maka Pratyahara belum berhasil.", source: "Buku Siswa Pendidikan Agama Hindu SMA", sourceChapter: "Pratyahara" },
+            { id: 48, materi: "Astangga Yoga", tingkat_kesulitan: "sedang", level_kognitif: "C3", stimulus: "Siswa SMA melatih konsentrasi belajarnya dengan memusatkan pandangan dan pikirannya pada satu titik (misalnya ujung lilin) tanpa berkedip selama beberapa menit.", pertanyaan: "Praktik pemusatan pikiran pada satu objek ini setara dengan tahapan...", options: { A: "Pranayama", B: "Dharana", C: "Niyama", D: "Asana" }, correctAnswer: "B", explanation: "Dharana adalah tahapan pemusatan pikiran pada satu titik/objek secara terus-menerus sebagai awal dari meditasi.", source: "Buku Siswa Pendidikan Agama Hindu SMA Kelas X", sourceChapter: "Dharana" },
+            { id: 49, materi: "Astangga Yoga", tingkat_kesulitan: "sulit", level_kognitif: "C5", stimulus: "Banyak instruktur senam di Barat mengajarkan 'Yoga' yang hanya berfokus pada kelenturan tubuh (stretching) untuk kebugaran fisik dan diet.", pertanyaan: "Kritik filosofis terhadap praktik tersebut berdasarkan teks Yoga Sutra Patanjali adalah...", options: { A: "Benar, karena tujuan utama Yoga adalah agar tubuh bugar dan hidup lama.", B: "Salah, karena praktik tersebut hanya mengambil unsur Asana (postur fisik), mengabaikan esensi spiritual pencapaian Samadhi.", C: "Benar, karena orang Barat tidak boleh mencapai Moksa.", D: "Salah, karena kelenturan tubuh adalah dilarang dalam Hindu." }, correctAnswer: "B", explanation: "Dalam Astangga Yoga, Asana (postur fisik) hanyalah tahap ke-3 untuk mempersiapkan fisik agar kuat bermeditasi (Dhyana-Samadhi), bukan tujuan akhir.", source: "Buku Panduan Guru Pendidikan Agama Hindu SMA", sourceChapter: "Esensi Yoga Darsana" },
+            { id: 50, materi: "Astangga Yoga", tingkat_kesulitan: "sedang", level_kognitif: "C2", stimulus: "Puncak tertinggi dari pelaksanaan Astangga Yoga adalah pencapaian pencerahan yang ditandai dengan bersatunya Atman dengan Brahman.", pertanyaan: "Tahapan penyatuan absolut tanpa ada lagi perbedaan antara yang bermeditasi dan objek meditasi disebut...", options: { A: "Pratyahara", B: "Dharana", C: "Dhyana", D: "Samadhi" }, correctAnswer: "D", explanation: "Samadhi adalah tahap ke-8 (tertinggi), penyatuan total jiwa dengan Tuhan, kesadaran kosmik, dan pembebasan murni.", source: "Buku Siswa Pendidikan Agama Hindu SMA Kelas X", sourceChapter: "Samadhi" }
+        ];
+
+        let appState = {
+            user: { name: "", class: "", school: "" },
+            mode: "lcc", // Hanya tersisa mode LCC
+            questions: [], // Will hold exactly 50 shuffled questions
+            currentIndex: 0,
+            answers: {}, // index -> selectedOption
+            score: 0,
+            streak: 0,
+            maxStreak: 0,
+            correctCount: 0,
+            wrongCount: 0,
+            globalStartTime: null,
+            globalEndTime: null,
+            globalTimerInterval: null,
+            lccTimerInterval: null,
+            lccTimeLeft: 30,
+            isAnswerLocked: false
+        };
+
+        const AUDIO = {
+            click: document.getElementById('audio-click'),
+            enabled: true
+        };
+
+        function playSound() {
+            if(AUDIO.enabled) {
+                AUDIO.click.currentTime = 0;
+                AUDIO.click.play().catch(e => console.log('Audio blocked by browser.'));
+            }
+        }
+        
+        document.getElementById('btn-audio').addEventListener('click', function() {
+            AUDIO.enabled = !AUDIO.enabled;
+            this.innerHTML = AUDIO.enabled ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+            if(AUDIO.enabled) this.classList.replace('bg-gray-600', 'bg-hindu-panel');
+            else this.classList.replace('bg-hindu-panel', 'bg-gray-600');
+        });
+
+        function shuffleArray(array) {
+            let curId = array.length;
+            while (0 !== curId) {
+                let randId = Math.floor(Math.random() * curId);
+                curId -= 1;
+                let tmp = array[curId];
+                array[curId] = array[randId];
+                array[randId] = tmp;
+            }
+            return array;
+        }
+
+        function formatTime(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = Math.floor(seconds % 60);
+            return h > 0 
+                ? `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+                : `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        // Validate 50 Questions (Safety Check as requested)
+        function checkQuestionsIntegrity() {
+            if(rawQuestions.length !== 50) console.warn("WARNING: Jumlah soal tidak tepat 50!");
+            let valid = rawQuestions.every(q => q.options.A && q.options.B && q.options.C && q.options.D && q.correctAnswer && q.explanation && q.source);
+            if(!valid) console.error("CRITICAL: Struktur soal ada yang rusak/kosong!");
+        }
+
+        function showScreen(screenId, mode = null) {
+            playSound();
+            document.querySelectorAll('#app > div').forEach(el => el.classList.add('hidden-screen'));
+            document.getElementById(screenId).classList.remove('hidden-screen');
+            if(mode) appState.mode = mode;
+            
+            if(screenId === 'screen-leaderboard') renderLeaderboard();
+            if(screenId === 'screen-admin') renderAdmin();
+        }
+
+        function startQuiz() {
+            const n = document.getElementById('input-name').value;
+            const c = document.getElementById('input-class').value;
+            const s = document.getElementById('input-school').value;
+            if(!n || !c || !s) { alert("Lengkapi data!"); return; }
+
+            appState.user = { name: n, class: c, school: s };
+            appState.currentIndex = 0;
+            appState.answers = {};
+            appState.score = 0;
+            appState.streak = 0;
+            appState.maxStreak = 0;
+            appState.correctCount = 0;
+            appState.wrongCount = 0;
+            
+            // Deep copy and shuffle questions
+            appState.questions = JSON.parse(JSON.stringify(rawQuestions));
+            shuffleArray(appState.questions);
+            
+            // Optionally shuffle options (A,B,C,D) here for extra difficulty, 
+            // but prompt requested balanced A/B/C/D key distribution which is pre-set.
+            
+            appState.globalStartTime = new Date();
+            startGlobalTimer();
+            
+            showScreen('screen-quiz');
+            document.getElementById('lcc-timer-container').classList.remove('hidden');
+
+            renderQuestion();
+        }
+
+        function startGlobalTimer() {
+            clearInterval(appState.globalTimerInterval);
+            appState.globalTimerInterval = setInterval(() => {
+                const now = new Date();
+                const diff = (now - appState.globalStartTime) / 1000;
+                document.getElementById('ui-global-time').innerText = formatTime(diff);
+            }, 1000);
+        }
+
+        function startLCCTimer() {
+            clearInterval(appState.lccTimerInterval);
+            appState.lccTimeLeft = 30;
+            document.getElementById('ui-lcc-time').innerText = appState.lccTimeLeft;
+            
+            appState.lccTimerInterval = setInterval(() => {
+                appState.lccTimeLeft--;
+                document.getElementById('ui-lcc-time').innerText = appState.lccTimeLeft;
+                if(appState.lccTimeLeft <= 0) {
+                    clearInterval(appState.lccTimerInterval);
+                    autoFailQuestion();
+                }
+            }, 1000);
+        }
+
+        function autoFailQuestion() {
+            if(appState.isAnswerLocked) return;
+            // Force wrong answer
+            appState.answers[appState.currentIndex] = "TIMEOUT";
+            appState.wrongCount++;
+            appState.streak = 0;
+            appState.isAnswerLocked = true;
+            
+            showExplanation(appState.questions[appState.currentIndex].correctAnswer, null);
+            updateNavButtons();
+        }
+
+        function renderQuestion() {
+            const idx = appState.currentIndex;
+            const q = appState.questions[idx];
+            appState.isAnswerLocked = !!appState.answers[idx]; // Lock if already answered
+            
+            // Update UI Counters
+            document.getElementById('ui-q-num').innerText = idx + 1;
+            document.getElementById('ui-score').innerText = appState.score;
+            document.getElementById('ui-progress').style.width = `${((idx) / 50) * 100}%`;
+            
+            document.getElementById('ui-q-materi').innerText = q.materi;
+            document.getElementById('ui-q-level').innerText = q.tingkat_kesulitan === 'sulit' ? `HOTS (${q.level_kognitif})` : `SEDANG (${q.level_kognitif})`;
+            document.getElementById('ui-q-stimulus').innerText = q.stimulus;
+            document.getElementById('ui-q-text').innerText = q.pertanyaan;
+
+            const optsContainer = document.getElementById('ui-options');
+            optsContainer.innerHTML = '';
+            
+            ['A', 'B', 'C', 'D'].forEach(key => {
+                const btn = document.createElement('button');
+                btn.className = `option-btn w-full text-left p-4 rounded-lg text-sm md:text-base cursor-pointer flex gap-3`;
+                btn.id = `opt-${key}`;
+                
+                // If already answered, apply styling
+                if (appState.isAnswerLocked) {
+                    btn.disabled = true;
+                    btn.classList.add('cursor-not-allowed', 'opacity-80');
+                    if (key === q.correctAnswer) btn.classList.add('option-correct');
+                    else if (key === appState.answers[idx]) btn.classList.add('option-wrong');
+                } else {
+                    btn.onclick = () => selectOption(key);
+                }
+
+                btn.innerHTML = `<span class="font-bold text-hindu-saffron">${key}.</span> <span>${q.options[key]}</span>`;
+                optsContainer.appendChild(btn);
+            });
+
+            // Handle Explanation Visibility
+            const expBox = document.getElementById('ui-explanation-box');
+            if (appState.isAnswerLocked) {
+                showExplanation(q.correctAnswer, appState.answers[idx]);
+            } else {
+                expBox.classList.add('hidden');
+                if(appState.mode === 'lcc') startLCCTimer();
+            }
+
+            updateNavButtons();
+        }
+
+        function selectOption(selectedKey) {
+            if(appState.isAnswerLocked) return;
+            playSound();
+            clearInterval(appState.lccTimerInterval); // Stop LCC timer
+            appState.isAnswerLocked = true;
+            
+            const idx = appState.currentIndex;
+            const q = appState.questions[idx];
+            appState.answers[idx] = selectedKey;
+
+            const isCorrect = selectedKey === q.correctAnswer;
+            
+            // Score calculation
+            if (isCorrect) {
+                appState.correctCount++;
+                appState.streak++;
+                let points = 100;
+                
+                // Streak Bonus
+                let streakMsg = "";
+                if (appState.streak === 3) { points += 30; streakMsg = "Streak x3! (+30 Poin)"; }
+                if (appState.streak >= 5) { points += 50; streakMsg = `Streak x${appState.streak}! (+50 Poin)`; }
+                
+                appState.score += points;
+                if(appState.streak > appState.maxStreak) appState.maxStreak = appState.streak;
+                
+                if(streakMsg) {
+                    const si = document.getElementById('streak-indicator');
+                    si.innerText = streakMsg;
+                    si.classList.remove('hidden');
+                    setTimeout(() => si.classList.add('hidden'), 2000);
+                }
+            } else {
+                appState.wrongCount++;
+                appState.streak = 0;
+            }
+
+            document.getElementById('ui-score').innerText = appState.score;
+            
+            // Re-render options to show colors
+            ['A', 'B', 'C', 'D'].forEach(key => {
+                const btn = document.getElementById(`opt-${key}`);
+                btn.disabled = true;
+                if (key === q.correctAnswer) btn.classList.add('option-correct');
+                else if (key === selectedKey) btn.classList.add('option-wrong');
+                else btn.classList.add('opacity-50');
+            });
+
+            showExplanation(q.correctAnswer, selectedKey);
+            updateNavButtons();
+        }
+
+        function showExplanation(correctKey, userKey) {
+            const q = appState.questions[appState.currentIndex];
+            const box = document.getElementById('ui-explanation-box');
+            const text = document.getElementById('ui-explanation-text');
+            
+            let html = `Jawaban Benar: <strong>${correctKey}</strong><br>`;
+            if (userKey === "TIMEOUT") html += `<span class="text-red-400 font-bold">Waktu Habis!</span><br>`;
+            html += `<p class="mt-2 text-justify">${q.explanation}</p>`;
+            
+            text.innerHTML = html;
+            document.getElementById('ui-source-text').innerText = `${q.source} (${q.sourceChapter})`;
+            box.classList.remove('hidden');
+        }
+
+        function updateNavButtons() {
+            const btnPrev = document.getElementById('btn-prev');
+            const btnNext = document.getElementById('btn-next');
+            const btnFinish = document.getElementById('btn-finish');
+
+            btnPrev.disabled = appState.currentIndex === 0;
+            
+            // Only show Next if answer is locked
+            if (appState.isAnswerLocked) {
+                if (appState.currentIndex === appState.questions.length - 1) {
+                    btnNext.classList.add('hidden');
+                    btnFinish.classList.remove('hidden');
+                } else {
+                    btnNext.classList.remove('hidden');
+                    btnFinish.classList.add('hidden');
+                }
+            } else {
+                btnNext.classList.add('hidden');
+                btnFinish.classList.add('hidden');
+            }
+        }
+
+        function navQuestion(dir) {
+            playSound();
+            appState.currentIndex += dir;
+            renderQuestion();
+        }
+
+        function finishQuiz() {
+            playSound();
+            appState.globalEndTime = new Date();
+            clearInterval(appState.globalTimerInterval);
+            clearInterval(appState.lccTimerInterval);
+
+            const totalSecs = Math.floor((appState.globalEndTime - appState.globalStartTime) / 1000);
+            const timeStr = formatTime(totalSecs);
+            const percent = ((appState.score / 5000) * 100).toFixed(1); // Assuming 50 Qs * 100pts base
+
+            // Determine Category
+            let cat = "";
+            let p = parseInt(percent);
+            if(p >= 90) cat = "MASTER DHARMA 🥇";
+            else if(p >= 80) cat = "JUARA LCC 🥈";
+            else if(p >= 70) cat = "PEJUANG DHARMA 🥉";
+            else if(p >= 60) cat = "PEMBELAJAR TEKUN";
+            else cat = "CALON MASTER";
+
+            // Update Result UI
+            document.getElementById('res-identity').innerText = `${appState.user.name} | Kelas ${appState.user.class} | ${appState.user.school}`;
+            document.getElementById('res-score').innerText = appState.score;
+            document.getElementById('res-title').innerText = cat;
+            document.getElementById('res-percent').innerText = `${percent}%`;
+            document.getElementById('res-correct').innerText = appState.correctCount;
+            document.getElementById('res-wrong').innerText = appState.wrongCount;
+            document.getElementById('res-time').innerText = timeStr;
+            document.getElementById('res-streak').innerText = appState.maxStreak;
+
+            // Generate Analytics
+            generateAnalytics();
+
+            // Save Data
+            saveSession(totalSecs, timeStr, cat, percent);
+
+            showScreen('screen-result');
+        }
+
+        function generateAnalytics() {
+            const container = document.getElementById('res-analytics');
+            container.innerHTML = '';
+            
+            const stats = {};
+            appState.questions.forEach((q, idx) => {
+                if(!stats[q.materi]) stats[q.materi] = { total: 0, correct: 0 };
+                stats[q.materi].total++;
+                if(appState.answers[idx] === q.correctAnswer) stats[q.materi].correct++;
+            });
+
+            for (const [materi, stat] of Object.entries(stats)) {
+                const p = (stat.correct / stat.total) * 100;
+                let colorClass = p > 75 ? 'bg-green-500' : p > 50 ? 'bg-yellow-500' : 'bg-red-500';
+                
+                container.innerHTML += `
+                    <div>
+                        <div class="flex justify-between text-xs text-gray-300 mb-1">
+                            <span>${materi}</span>
+                            <span>${stat.correct}/${stat.total}</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-1.5">
+                            <div class="${colorClass} h-1.5 rounded-full" style="width: ${p}%"></div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function saveSession(secs, timeStr, cat, percent) {
+            const resultData = {
+                date: new Date().toISOString(),
+                user: appState.user,
+                score: appState.score,
+                correct: appState.correctCount,
+                wrong: appState.wrongCount,
+                timeSecs: secs,
+                timeStr: timeStr,
+                category: cat,
+                percent: percent
+            };
+
+            let history = JSON.parse(localStorage.getItem('hinduQuestHistory') || '[]');
+            history.push(resultData);
+            localStorage.setItem('hinduQuestHistory', JSON.stringify(history));
+            
+            buildReviewDOM();
+        }
+
+        function renderLeaderboard() {
+            let history = JSON.parse(localStorage.getItem('hinduQuestHistory') || '[]');
+            // Sort by score DESC, then time ASC
+            history.sort((a, b) => {
+                if (b.score !== a.score) return b.score - a.score;
+                return a.timeSecs - b.timeSecs;
+            });
+
+            const tbody = document.getElementById('leaderboard-body');
+            tbody.innerHTML = '';
+            
+            history.slice(0, 10).forEach((entry, idx) => {
+                let rankIcon = idx + 1;
+                if(idx === 0) rankIcon = '🥇';
+                if(idx === 1) rankIcon = '🥈';
+                if(idx === 2) rankIcon = '🥉';
+
+                tbody.innerHTML += `
+                    <tr class="border-b border-gray-700 hover:bg-gray-800">
+                        <td class="px-4 py-2 font-bold text-hindu-saffron">${rankIcon}</td>
+                        <td class="px-4 py-2">${entry.user.name}</td>
+                        <td class="px-4 py-2 text-xs text-gray-400">${entry.user.school}</td>
+                        <td class="px-4 py-2 font-bold">${entry.score}</td>
+                        <td class="px-4 py-2 font-mono text-xs">${entry.timeStr}</td>
+                    </tr>
+                `;
+            });
+            if(history.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4">Belum ada data</td></tr>`;
+            }
+        }
+
+        let adminSort = { key: 'date', asc: false };
+        function renderAdmin(sortKey = null) {
+            let history = JSON.parse(localStorage.getItem('hinduQuestHistory') || '[]');
+            
+            if(sortKey) {
+                if(adminSort.key === sortKey) adminSort.asc = !adminSort.asc;
+                else { adminSort.key = sortKey; adminSort.asc = true; }
+            }
+
+            history.sort((a, b) => {
+                let valA, valB;
+                if(adminSort.key === 'date') { valA = new Date(a.date).getTime(); valB = new Date(b.date).getTime(); }
+                if(adminSort.key === 'name') { valA = a.user.name.toLowerCase(); valB = b.user.name.toLowerCase(); }
+                if(adminSort.key === 'score') { valA = a.score; valB = b.score; }
+
+                if (valA < valB) return adminSort.asc ? -1 : 1;
+                if (valA > valB) return adminSort.asc ? 1 : -1;
+                return 0;
+            });
+
+            document.getElementById('adm-total').innerText = history.length;
+            const avg = history.length > 0 ? (history.reduce((sum, el) => sum + el.score, 0) / history.length).toFixed(0) : 0;
+            document.getElementById('adm-avg').innerText = avg;
+
+            const tbody = document.getElementById('admin-body');
+            tbody.innerHTML = '';
+            
+            history.forEach(entry => {
+                const dt = new Date(entry.date).toLocaleString('id-ID', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'});
+                tbody.innerHTML += `
+                    <tr class="border-b border-gray-700 hover:bg-gray-800">
+                        <td class="px-3 py-2 text-xs">${dt}</td>
+                        <td class="px-3 py-2">${entry.user.name}</td>
+                        <td class="px-3 py-2 text-xs">${entry.user.class}</td>
+                        <td class="px-3 py-2 text-xs text-gray-400">${entry.user.school}</td>
+                        <td class="px-3 py-2 font-bold text-hindu-saffron">${entry.score}</td>
+                        <td class="px-3 py-2 text-xs"><span class="text-green-500">${entry.correct}</span> / <span class="text-red-500">${entry.wrong}</span></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function clearAdminData() {
+            if(confirm("Yakin hapus semua data peserta?")) {
+                localStorage.removeItem('hinduQuestHistory');
+                renderAdmin();
+            }
+        }
+
+        function exportCSV() {
+            let history = JSON.parse(localStorage.getItem('hinduQuestHistory') || '[]');
+            if(history.length === 0) return alert('Tidak ada data');
+            
+            let csv = "Waktu,Nama,Kelas,Sekolah,Skor,Benar,Salah,Waktu Pengerjaan\n";
+            history.forEach(h => {
+                csv += `"${new Date(h.date).toLocaleString('id-ID')}","${h.user.name}","${h.user.class}","${h.user.school}","${h.score}","${h.correct}","${h.wrong}","${h.timeStr}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "hasil_kuis_hindu.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function buildReviewDOM() {
+            const container = document.getElementById('review-container');
+            container.innerHTML = '';
+
+            appState.questions.forEach((q, idx) => {
+                const uAns = appState.answers[idx];
+                const isCorrect = uAns === q.correctAnswer;
+                
+                container.innerHTML += `
+                    <div class="bg-gray-800 p-4 rounded-lg border-l-4 ${isCorrect ? 'border-green-500' : 'border-red-500'}">
+                        <div class="flex justify-between mb-2 border-b border-gray-700 pb-2">
+                            <span class="font-bold text-gray-300">Soal ${idx + 1}</span>
+                            <span>${isCorrect ? '✅ Benar' : '❌ Salah'}</span>
+                        </div>
+                        <p class="text-sm mb-3">${q.stimulus ? '<em>' + q.stimulus + '</em><br>' : ''}${q.pertanyaan}</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm mb-3">
+                            <div class="p-2 rounded bg-gray-900 border ${isCorrect ? 'border-green-500/50' : 'border-red-500/50'}">
+                                Jawab: <strong>${uAns || 'Kosong'}</strong>. ${uAns && q.options[uAns] ? q.options[uAns] : ''}
+                            </div>
+                            <div class="p-2 rounded bg-green-900/30 border border-green-500/50 text-green-100">
+                                Kunci: <strong>${q.correctAnswer}</strong>. ${q.options[q.correctAnswer]}
+                            </div>
+                        </div>
+
+                        <div class="text-xs text-gray-400 bg-gray-900 p-3 rounded">
+                            <strong class="text-hindu-saffron">Pembahasan:</strong> ${q.explanation}<br>
+                            <em class="mt-1 block text-gray-500">Sumber: ${q.source} (${q.sourceChapter})</em>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function restartQuiz() {
+            playSound();
+            startQuiz();
+        }
+
+        // Initialize checks on load
+        window.onload = () => {
+            checkQuestionsIntegrity();
+        };
+
+    </script>
+</body>
+</html>
